@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noResolve": false,
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "preserveConstEnums":true,
+    "esModuleInterop": true,
+    "rootDir": "./",
+    "declaration": true
+  }
+}

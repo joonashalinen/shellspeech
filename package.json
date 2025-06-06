@@ -19,5 +19,14 @@
   "bugs": {
     "url": "https://github.com/joonashalinen/shellspeech/issues"
   },
-  "homepage": "https://github.com/joonashalinen/shellspeech#readme"
+  "homepage": "https://github.com/joonashalinen/shellspeech#readme",
+  "types": "index.d.ts",
+  "dependencies": {
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.0.0-beta.3",
+    "typescript": "^5.8.3"
+  },
+  "type": "module"
 }
