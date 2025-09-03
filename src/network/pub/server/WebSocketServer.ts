@@ -35,7 +35,9 @@ export default class WebSocketServer implements IMessenger<DMessage, DMessage> {
     }
 
     postMessage(msg: DMessage): void {
-        if (this._webSockets.has(msg.recipient)) {
+        if (msg.recipient === "*") {
+            this._webSockets.forEach((ws) => ws.postMessage(msg));
+        } else if (this._webSockets.has(msg.recipient)) {
             this._webSockets.get(msg.recipient).postMessage(msg);
         }
     }

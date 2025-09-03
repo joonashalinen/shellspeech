@@ -29,7 +29,10 @@ export default class WebSocketServer {
         });
     }
     postMessage(msg) {
-        if (this._webSockets.has(msg.recipient)) {
+        if (msg.recipient === "*") {
+            this._webSockets.forEach((ws) => ws.postMessage(msg));
+        }
+        else if (this._webSockets.has(msg.recipient)) {
             this._webSockets.get(msg.recipient).postMessage(msg);
         }
     }
