@@ -17,10 +17,12 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
 
     constructor(
         public wrappee: C, 
-        public proxyMessenger: ProxyMessenger<DMessage, DMessage>, 
+        public proxyMessenger?: ProxyMessenger<DMessage, DMessage>, 
         public id: string = ""
     ) {
-        proxyMessenger.onPostMessage((msg) => this.emitter.trigger("message", [msg]));
+        if (proxyMessenger !== undefined) {
+            proxyMessenger.onPostMessage((msg) => this.emitter.trigger("message", [msg]));
+        }
     }
 
     /**
@@ -65,7 +67,9 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
             this._callMethod(msg);
 
         } else if (msg.type === "response") {
-            this.proxyMessenger.message(msg);
+            if (this.proxyMessenger !== undefined) {
+                this.proxyMessenger.message(msg);
+            }
 
         } else if (msg.type === "event") {
             if (

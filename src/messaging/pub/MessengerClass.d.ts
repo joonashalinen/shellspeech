@@ -11,11 +11,11 @@ type Messenger = IMessenger<DMessage, DMessage>;
  */
 export default class MessengerClass<C> implements IMessenger<DMessage, DMessage> {
     wrappee: C;
-    proxyMessenger: ProxyMessenger<DMessage, DMessage>;
+    proxyMessenger?: ProxyMessenger<DMessage, DMessage>;
     id: string;
     emitter: EventEmitter;
     errorPolicy: "crash" | "notify";
-    constructor(wrappee: C, proxyMessenger: ProxyMessenger<DMessage, DMessage>, id?: string);
+    constructor(wrappee: C, proxyMessenger?: ProxyMessenger<DMessage, DMessage>, id?: string);
     /**
      * Call a method on the wrapped class. If the class
      * returns a result value, it will be emitted as a response message.

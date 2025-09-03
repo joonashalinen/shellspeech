@@ -21,7 +21,9 @@ export default class MessengerClass {
         this.id = id;
         this.emitter = new EventEmitter();
         this.errorPolicy = "crash";
-        proxyMessenger.onPostMessage((msg) => this.emitter.trigger("message", [msg]));
+        if (proxyMessenger !== undefined) {
+            proxyMessenger.onPostMessage((msg) => this.emitter.trigger("message", [msg]));
+        }
     }
     /**
      * Call a method on the wrapped class. If the class
@@ -64,7 +66,9 @@ export default class MessengerClass {
             this._callMethod(msg);
         }
         else if (msg.type === "response") {
-            this.proxyMessenger.message(msg);
+            if (this.proxyMessenger !== undefined) {
+                this.proxyMessenger.message(msg);
+            }
         }
         else if (msg.type === "event") {
             if (typeof this.wrappee === "object" &&
