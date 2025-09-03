@@ -1,14 +1,14 @@
 import { WebSocketServer as RawWebSocketServer } from 'ws';
-import WebSocketMessenger from "./WebSocketMessenger";
+import WebSocketMessenger from "./WebSocketMessenger.js";
 import { EventEmitter } from "events";
 /**
  * A websocket server as an IMessenger.
  */
 export default class WebSocketServer {
-    constructor() {
+    constructor(serverOptions) {
         this._webSockets = new Map();
         this._emitter = new EventEmitter();
-        this._server = new RawWebSocketServer();
+        this._server = new RawWebSocketServer(serverOptions);
         this._server.on("connection", (ws) => {
             const client = new WebSocketMessenger(ws);
             let name;

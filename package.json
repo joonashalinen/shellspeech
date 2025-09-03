@@ -29,5 +29,27 @@
     "@types/ws": "^8.18.1",
     "typescript": "^5.8.3"
   },
-  "type": "module"
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./messaging": {
+      "types": "./src/messaging/index.d.ts",
+      "default": "./src/messaging/index.js"
+    },
+    "./services": {
+      "types": "./src/services/index.d.ts",
+      "default": "./src/services/index.js"
+    },
+    "./events": {
+      "types": "./src/events/index.d.ts",
+      "default": "./src/events/index.js"
+    },
+    "./network": {
+      "types": "./src/network/index.d.ts",
+      "default": "./src/network/index.js"
+    }
+  }
 }

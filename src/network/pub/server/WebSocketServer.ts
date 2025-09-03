@@ -1,7 +1,7 @@
-import { IMessenger, Mediator } from "../../../messaging";
-import { WebSocketServer as RawWebSocketServer } from 'ws';
-import WebSocketMessenger from "./WebSocketMessenger";
-import { DMessage } from "../../../messaging/pub/DMessage";
+import type IMessenger from "../../../messaging/pub/IMessenger.d.ts";
+import { WebSocketServer as RawWebSocketServer, ServerOptions } from 'ws';
+import WebSocketMessenger from "./WebSocketMessenger.js";
+import type { DMessage } from "../../../messaging/pub/DMessage.d.ts";
 import { EventEmitter } from "events"
 
 /**
@@ -12,8 +12,8 @@ export default class WebSocketServer implements IMessenger<DMessage, DMessage> {
     private _webSockets: Map<string, WebSocketMessenger<DMessage, DMessage>> = new Map();
     private _emitter = new EventEmitter();
 
-    constructor() {
-        this._server = new RawWebSocketServer();
+    constructor(serverOptions?: ServerOptions) {
+        this._server = new RawWebSocketServer(serverOptions);
         this._server.on("connection", (ws) => {
             const client = new WebSocketMessenger<DMessage, DMessage>(ws);
             let name: string;
