@@ -29,39 +29,36 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
      * The given msg is assumed to be of type "request".
      */
     async _callMethod(msg: DMessage) {
+        const args: unknown[] = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
+
         var result: unknown;
         if (this.errorPolicy === "crash") {
-            result = await this.wrappee[msg.message.type](...msg.message.args, msg);
+            result = await this.wrappee[msg.message.type](...args, msg);
         } else {
             try {
-                result = await this.wrappee[msg.message.type](...msg.message.args, msg);
+                result = await this.wrappee[msg.message.type](...args, msg);
             } catch (e) {
                 result = {error: e.toString()};
             }
         }
-        // If the result is not the wrapped class itself or undefined then we assume 
-        // that the result value matters and we send it as a response message.
-        if (
-            result !== undefined && 
-            !(typeof result === "object" && result.constructor === this.wrappee.constructor)
-        ) {
-            const responseMsg: DMessage = {
-                sender: this.id,
-                recipient: msg.sender,
-                id: msg.id,
-                type: "response",
-                message: {
-                    type: msg.message.type,
-                    args: [result]
-                }
-            };
-            this.emitter.trigger("message", [responseMsg]);
-        }
+
+        const returnResult = (result !== undefined && result !== this.wrappee);
+        const responseMsg: DMessage = {
+            sender: this.id,
+            recipient: msg.sender,
+            id: msg.id,
+            type: "response",
+            message: {
+                type: msg.message.type,
+                args: returnResult ? [result] : []
+            }
+        };
+        this.emitter.trigger("message", [responseMsg]);
     }
 
     postMessage(msg: DMessage): Messenger {
         if (
-            msg.type === "request" && 
+            (msg.type === "request" || msg.type === "listen") && 
             typeof this.wrappee === "object" && 
             msg.message.type in this.wrappee
         ) {
@@ -98,5 +95,32 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
     offMessage(handler: (msg: DMessage) => void): Messenger {
         this.emitter.off("message", handler);
         return this;
+    }
+
+    private _listenCallArgs(msg: DMessage) {
+        const args = Array.from(msg.message.args);
+        const functionIndex = args.findIndex((a) => a === "<f>");
+
+        const eventName = (
+            typeof this.wrappee === "object" && "outEvents" in this.wrappee && 
+            typeof this.wrappee.outEvents[msg.message.type] === "string"
+            ) ?
+            this.wrappee.outEvents[msg.message.type] : msg.message.type;
+
+        const callback = (...eventArgs: unknown[]) => {
+            this.emitter.trigger("message", [{
+                sender: this.id,
+                recipient: msg.sender,
+                id: "-",
+                type: "event",
+                message: {
+                    type: eventName,
+                    args: eventArgs
+                }
+            }]);
+        };
+
+        args[functionIndex !== -1 ? functionIndex : args.length] = callback;
+        return args;
     }
 }

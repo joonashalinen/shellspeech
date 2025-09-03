@@ -40,6 +40,9 @@ export default class Mediator {
     _postActorMessage(name, actor, msg) {
         actor.postMessage(msg);
         this.emitter.trigger(name, [msg]);
+        if (name !== "*") {
+            this.emitter.trigger("*", [msg]);
+        }
     }
     addActor(id, actor) {
         if (id in this.actors) {

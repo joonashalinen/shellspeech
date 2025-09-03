@@ -8,7 +8,7 @@ export interface DMessage {
     sender: string;
     recipient: string;
     subRecipients?: Array<string>;
-    type: "request" | "event" | "response";
+    type: "request" | "event" | "response" | "listen";
     id?: string;
     message: DMessageData;
 };

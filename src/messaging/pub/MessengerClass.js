@@ -30,38 +30,35 @@ export default class MessengerClass {
      */
     _callMethod(msg) {
         return __awaiter(this, void 0, void 0, function* () {
+            const args = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
             var result;
             if (this.errorPolicy === "crash") {
-                result = yield this.wrappee[msg.message.type](...msg.message.args, msg);
+                result = yield this.wrappee[msg.message.type](...args, msg);
             }
             else {
                 try {
-                    result = yield this.wrappee[msg.message.type](...msg.message.args, msg);
+                    result = yield this.wrappee[msg.message.type](...args, msg);
                 }
                 catch (e) {
                     result = { error: e.toString() };
                 }
             }
-            // If the result is not the wrapped class itself or undefined then we assume 
-            // that the result value matters and we send it as a response message.
-            if (result !== undefined &&
-                !(typeof result === "object" && result.constructor === this.wrappee.constructor)) {
-                const responseMsg = {
-                    sender: this.id,
-                    recipient: msg.sender,
-                    id: msg.id,
-                    type: "response",
-                    message: {
-                        type: msg.message.type,
-                        args: [result]
-                    }
-                };
-                this.emitter.trigger("message", [responseMsg]);
-            }
+            const returnResult = (result !== undefined && result !== this.wrappee);
+            const responseMsg = {
+                sender: this.id,
+                recipient: msg.sender,
+                id: msg.id,
+                type: "response",
+                message: {
+                    type: msg.message.type,
+                    args: returnResult ? [result] : []
+                }
+            };
+            this.emitter.trigger("message", [responseMsg]);
         });
     }
     postMessage(msg) {
-        if (msg.type === "request" &&
+        if ((msg.type === "request" || msg.type === "listen") &&
             typeof this.wrappee === "object" &&
             msg.message.type in this.wrappee) {
             this._callMethod(msg);
@@ -94,6 +91,27 @@ export default class MessengerClass {
     offMessage(handler) {
         this.emitter.off("message", handler);
         return this;
+    }
+    _listenCallArgs(msg) {
+        const args = Array.from(msg.message.args);
+        const functionIndex = args.findIndex((a) => a === "<f>");
+        const eventName = (typeof this.wrappee === "object" && "outEvents" in this.wrappee &&
+            typeof this.wrappee.outEvents[msg.message.type] === "string") ?
+            this.wrappee.outEvents[msg.message.type] : msg.message.type;
+        const callback = (...eventArgs) => {
+            this.emitter.trigger("message", [{
+                    sender: this.id,
+                    recipient: msg.sender,
+                    id: "-",
+                    type: "event",
+                    message: {
+                        type: eventName,
+                        args: eventArgs
+                    }
+                }]);
+        };
+        args[functionIndex !== -1 ? functionIndex : args.length] = callback;
+        return args;
     }
 }
 //# sourceMappingURL=MessengerClass.js.map

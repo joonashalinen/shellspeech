@@ -25,5 +25,6 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
     postMessage(msg: DMessage): Messenger;
     onMessage(handler: (msg: DMessage) => void): Messenger;
     offMessage(handler: (msg: DMessage) => void): Messenger;
+    private _listenCallArgs;
 }
 export {};

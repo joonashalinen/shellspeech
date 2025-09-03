@@ -58,7 +58,7 @@ export default class EventEmitter {
 
         for (var i = 0; i < this._eventListeners.length; i++) {
             if (this._eventListeners[i].event === event) {
-                this._eventListeners[i].callback.apply(null, args);
+                this._eventListeners[i].callback(...args);
             }
         }
     }
@@ -68,7 +68,7 @@ export default class EventEmitter {
 
         for (var i = 0; i < this._eventListeners.length; i++) {
             if (this._eventListeners[i].event === event) {
-                await this._eventListeners[i].callback.apply(null, args);
+                await this._eventListeners[i].callback(...args);
             }
         }
     }

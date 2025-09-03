@@ -54,6 +54,9 @@ export default class Mediator implements IMediator, IEventable {
     _postActorMessage(name: string, actor: Actor, msg: DMessage): void {
         actor.postMessage(msg);
         this.emitter.trigger(name, [msg]);
+        if (name !== "*") {
+            this.emitter.trigger("*", [msg]);
+        }
     }
 
     addActor(id: string, actor: Actor) {

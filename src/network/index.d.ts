@@ -1,2 +1,3 @@
 import WebSocketMessenger from "./pub/server/WebSocketMessenger.js";
-export { WebSocketMessenger };
+import WebSocketServer from "./pub/server/WebSocketServer.js";
+export { WebSocketMessenger, WebSocketServer };
