@@ -1,8 +1,8 @@
-import IMessenger from "../../messaging/pub/IMessenger";
-import DataObject from "../../data_structures/pub/DataObject";
-import DeepMappableObject from "../../data_structures/pub/DeepMappableObject";
-import VariableType from "../../types/VariableType";
-import EncodeableFunction from "../../types/EncodeableFunction";
+import type IMessenger from "../../messaging/pub/IMessenger.d.ts";
+import type DataObject from "../../data_structures/pub/DataObject.d.ts";
+import DeepMappableObject from "../../data_structures/pub/DeepMappableObject.js";
+import VariableType from "../../types/VariableType.js";
+import EncodeableFunction from "../../types/EncodeableFunction.js";
 
 export interface BrowserWebWorker {
     postMessage(msg: unknown): void;

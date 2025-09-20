@@ -1,4 +1,4 @@
-import WebWorker, { BrowserWebWorker } from '../pub/WebWorker';
+import WebWorker, { BrowserWebWorker } from '../pub/WebWorker.js';
 import {describe, expect, test, jest, beforeEach} from '@jest/globals';
 
 // Mock BrowserWebWorker
