@@ -17,12 +17,12 @@ export type IServerProtocol = "webSocket" | "local";
  * which the IService class can be accessed.
  */
 export class ServiceWrapper<IServiceConfig> {
-    private _messagePipe?: MessagePipe<DMessage, DMessage>;
-    private _serviceMessenger?: MessengerClass<IService>;
-    private _config: IServiceWrapperConfig<IServiceConfig>;
+    protected _messagePipe?: MessagePipe<DMessage, DMessage>;
+    protected _serviceMessenger?: MessengerClass<IService>;
+    protected _config: IServiceWrapperConfig<IServiceConfig>;
 
-    constructor(private _service: IService, private _isServer: boolean = false,
-        private _serverProtocol: IServerProtocol = "local") {}
+    constructor(protected _service: IService, protected _isServer: boolean = false,
+        protected _serverProtocol: IServerProtocol = "local") {}
 
     async initialize(configPath: string) {
         this._config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
