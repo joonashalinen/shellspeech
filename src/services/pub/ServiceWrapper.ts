@@ -26,7 +26,6 @@ export class ServiceWrapper<IServiceConfig> {
 
     async initialize(configPath: string) {
         this._config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
-        await this._service.initialize(this._config.serviceConfig);
 
         if (this._isServer) {
             if (this._serverProtocol === "webSocket") {
