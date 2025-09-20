@@ -7,16 +7,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { EventEmitter } from "../../events/index.js";
 import ArithmeticSequence from "../../math/pub/ArithmeticSequence.js";
 import StringSequence from "../../strings/pub/StringSequence.js";
 /**
  * Provides the ability to perform synchronous messaging
- * with an IMessenger.
+ * with an IMessenger. Warning: it is assumed that there is
+ * only one SyncMessenger per client service. Otherwise it is
+ * possible that there are id conflicts, which can cause messages
+ * to be redirected to the wrong caller.
  */
 export default class SyncMessenger {
     constructor(messenger) {
         this.idGenerator = new StringSequence(new ArithmeticSequence());
+        this.emitter = new EventEmitter();
         this.messenger = messenger;
+        this.messenger.onMessage((m) => {
+            this.emitter.trigger(m.id, [m]);
+        });
     }
     /**
      * Posts a synchronous message that will yield
@@ -36,6 +44,17 @@ export default class SyncMessenger {
             });
             this.messenger.postMessage(req);
             return yield waitForResponse;
+        });
+    }
+    listen(req, callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (req.type !== "listen")
+                throw new Error("SyncMessenger.listen expects the message to have type 'listen'");
+            if (req.id === undefined) {
+                req.id = req.sender + ":" + this.idGenerator.next();
+            }
+            this.emitter.on(req.id, callback);
+            return yield this.postSyncMessage(req);
         });
     }
 }
