@@ -24,6 +24,7 @@ export class ServiceWrapper {
     initialize(configPath) {
         return __awaiter(this, void 0, void 0, function* () {
             this._config = JSON.parse(yield fs.readFile(configPath, 'utf-8'));
+            this._service.id = this._config.id;
             if (this._isServer) {
                 if (this._serverProtocol === "webSocket") {
                     const server = new WebSocketServer({ port: this._config.serverPort });

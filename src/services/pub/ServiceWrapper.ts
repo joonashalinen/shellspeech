@@ -27,6 +27,8 @@ export class ServiceWrapper<IServiceConfig> {
     async initialize(configPath: string) {
         this._config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
 
+        this._service.id = this._config.id;
+
         if (this._isServer) {
             if (this._serverProtocol === "webSocket") {
                 const server = new WebSocketServer({port: this._config.serverPort});
