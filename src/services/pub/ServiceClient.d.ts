@@ -8,5 +8,5 @@ export default class ServiceClient {
     targetServiceId: string;
     constructor(messenger: SyncMessenger, clientServiceId: string, targetServiceId: string);
     protected _call<T>(method: string, args: unknown[]): Promise<T>;
-    protected _listen<T>(method: string, args: unknown[], callback: (r: T) => unknown): Promise<void>;
+    protected _listen(method: string, args: unknown[], callback: (...args: unknown[]) => unknown): Promise<void>;
 }

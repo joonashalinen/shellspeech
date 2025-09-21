@@ -19,8 +19,8 @@ export default class ServiceClient {
         }) as Promise<T>;
     }
 
-    protected async _listen<T>(method: string,
-        args: unknown[], callback: (r: T) => unknown): Promise<void> {
+    protected async _listen(method: string,
+        args: unknown[], callback: (...args: unknown[]) => unknown): Promise<void> {
         
         const req: DMessage = {
             sender: this.clientServiceId,

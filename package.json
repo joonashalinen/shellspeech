@@ -1,6 +1,6 @@
 {
   "name": "shellspeech",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "A messaging library for microservices.",
   "main": "index.js",
   "scripts": {
