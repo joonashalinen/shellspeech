@@ -44,7 +44,7 @@ export default class SyncMessenger {
         return await waitForResponse;
     }
 
-    async listen(req: DMessage, callback: (m: DMessage) => unknown): Promise<unknown> {
+    async listen(req: DMessage, callback: (m: unknown) => unknown): Promise<unknown> {
         if (req.type !== "listen")
             throw new Error("SyncMessenger.listen expects the message to have type 'listen'");
 
@@ -52,7 +52,9 @@ export default class SyncMessenger {
             req.id = req.sender + ":" + this.idGenerator.next();
         }
 
-        this.emitter.on(req.id, callback);
+        this.emitter.on(req.id, (m: DMessage) => {
+            callback(m.message.args[0]);
+        });
         return await this.postSyncMessage(req);
     }
 }

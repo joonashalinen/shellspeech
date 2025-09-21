@@ -53,7 +53,9 @@ export default class SyncMessenger {
             if (req.id === undefined) {
                 req.id = req.sender + ":" + this.idGenerator.next();
             }
-            this.emitter.on(req.id, callback);
+            this.emitter.on(req.id, (m) => {
+                callback(m.message.args[0]);
+            });
             return yield this.postSyncMessage(req);
         });
     }

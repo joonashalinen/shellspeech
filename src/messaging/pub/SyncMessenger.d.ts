@@ -19,5 +19,5 @@ export default class SyncMessenger {
      * a response as a result.
      */
     postSyncMessage(req: DMessage): Promise<unknown>;
-    listen(req: DMessage, callback: (m: DMessage) => unknown): Promise<unknown>;
+    listen(req: DMessage, callback: (m: unknown) => unknown): Promise<unknown>;
 }
