@@ -33,14 +33,16 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
     async _callMethod(msg: DMessage) {
         const args: unknown[] = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
 
-        var result: unknown;
+        let result: unknown;
+        let error: unknown;
         if (this.errorPolicy === "crash") {
             result = await this.wrappee[msg.message.type](...args, msg);
         } else {
             try {
                 result = await this.wrappee[msg.message.type](...args, msg);
             } catch (e) {
-                result = {error: e.toString()};
+                result = undefined;
+                error = e;
             }
         }
 
@@ -53,7 +55,8 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
             message: {
                 type: msg.message.type,
                 args: returnResult ? [result] : []
-            }
+            },
+            ...(error !== undefined ? {error: error.toString()} : {})
         };
         this.emitter.trigger("message", [responseMsg]);
     }

@@ -31,11 +31,15 @@ export default class SyncMessenger {
         if (req.id === undefined) {
             req.id = req.sender + ":" + this.idGenerator.next();
         }
-
-        const waitForResponse = new Promise<unknown>((resolve) => {
+        
+        const waitForResponse = new Promise<unknown>((resolve, reject) => {
             this.messenger.onMessage((res: DMessage) => {
                 if (res.type === "response" && res.recipient === req.sender && res.id === req.id) {
-                    resolve(res.message.args[0]);
+                    if (res.error === undefined) {
+                        resolve(res.message.args[0]);
+                    } else {
+                        reject(new Error(res.error));
+                    }
                 }
             });
         });
