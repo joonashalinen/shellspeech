@@ -5,6 +5,7 @@ export default class WebSocketMessenger<A, B> implements IMessenger<A, B> {
     private messageHandlers;
     constructor(socket: WebSocket);
     private setupWebSocket;
+    initialize(): Promise<void>;
     postMessage(msg: A): IMessenger<A, B>;
     onMessage(handler: (msg: B) => void): IMessenger<A, B>;
     offMessage(handler: (msg: B) => void): IMessenger<A, B>;

@@ -33,7 +33,8 @@ export default class MessengerClass {
     _callMethod(msg) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
-            var result;
+            let result;
+            let error;
             if (this.errorPolicy === "crash") {
                 result = yield this.wrappee[msg.message.type](...args, msg);
             }
@@ -42,20 +43,15 @@ export default class MessengerClass {
                     result = yield this.wrappee[msg.message.type](...args, msg);
                 }
                 catch (e) {
-                    result = { error: e.toString() };
+                    result = undefined;
+                    error = e;
                 }
             }
             const returnResult = (result !== undefined && result !== this.wrappee);
-            const responseMsg = {
-                sender: this.id,
-                recipient: msg.sender,
-                id: msg.id,
-                type: "response",
-                message: {
+            const responseMsg = Object.assign({ sender: this.id, recipient: msg.sender, id: msg.id, type: "response", message: {
                     type: msg.message.type,
                     args: returnResult ? [result] : []
-                }
-            };
+                } }, (error !== undefined ? { error: error.toString() } : {}));
             this.emitter.trigger("message", [responseMsg]);
         });
     }

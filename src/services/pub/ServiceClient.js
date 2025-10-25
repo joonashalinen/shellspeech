@@ -16,6 +16,19 @@ export default class ServiceClient {
         this.clientServiceId = clientServiceId;
         this.targetServiceId = targetServiceId;
     }
+    initialize() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.messenger.messenger.postMessage({
+                sender: this.clientServiceId,
+                recipient: this.targetServiceId,
+                type: "event",
+                message: {
+                    type: "hello",
+                    args: []
+                }
+            });
+        });
+    }
     _call(method, args) {
         return this.messenger.postSyncMessage({
             sender: this.clientServiceId,

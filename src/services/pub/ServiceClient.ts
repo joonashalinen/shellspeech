@@ -7,6 +7,18 @@ export default class ServiceClient {
     constructor(public messenger: SyncMessenger,
         public clientServiceId: string, public targetServiceId: string) {}
     
+    async initialize() {
+        this.messenger.messenger.postMessage({
+            sender: this.clientServiceId,
+            recipient: this.targetServiceId,
+            type: "event",
+            message: {
+                type: "hello",
+                args: []
+            }
+        });
+    }
+
     protected _call<T>(method: string, args: unknown[]): Promise<T> {
         return this.messenger.postSyncMessage({
             sender: this.clientServiceId,

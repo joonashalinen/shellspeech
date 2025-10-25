@@ -21,6 +21,13 @@ export default class WebSocketMessenger<A, B> implements IMessenger<A, B> {
         });
     }
 
+    async initialize() {
+        await new Promise<void>((resolve, reject) => {
+            this.ws.on("open", () => { resolve() });
+            this.ws.on("error", (e) => { reject(e) });
+        });
+    }
+
     postMessage(msg: A): IMessenger<A, B> {
         try {
             const serializedMsg = JSON.stringify(msg);

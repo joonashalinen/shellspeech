@@ -9,4 +9,5 @@ export interface DMessage {
     type: "request" | "event" | "response" | "listen";
     id?: string;
     message: DMessageData;
+    error?: string;
 }

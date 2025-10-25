@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 export default class WebSocketMessenger {
     constructor(socket) {
         this.messageHandlers = [];
@@ -13,6 +22,14 @@ export default class WebSocketMessenger {
             catch (error) {
                 throw new Error('Error parsing incoming message:' + error);
             }
+        });
+    }
+    initialize() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield new Promise((resolve, reject) => {
+                this.ws.on("open", () => { resolve(); });
+                this.ws.on("error", (e) => { reject(e); });
+            });
         });
     }
     postMessage(msg) {
