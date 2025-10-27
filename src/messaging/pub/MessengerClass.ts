@@ -118,7 +118,7 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
             this.emitter.trigger("message", [{
                 sender: this.id,
                 recipient: msg.sender,
-                id: "-",
+                id: msg.id,
                 type: "event",
                 message: {
                     type: eventName,

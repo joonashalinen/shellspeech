@@ -102,7 +102,7 @@ export default class MessengerClass {
             this.emitter.trigger("message", [{
                     sender: this.id,
                     recipient: msg.sender,
-                    id: "-",
+                    id: msg.id,
                     type: "event",
                     message: {
                         type: eventName,

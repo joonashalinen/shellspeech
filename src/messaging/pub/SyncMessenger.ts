@@ -57,7 +57,9 @@ export default class SyncMessenger {
         }
 
         this.emitter.on(req.id, (m: DMessage) => {
-            callback(...m.message.args);
+            if (m.type === "event" && m.recipient === req.sender && m.id === req.id) {
+                callback(...m.message.args);
+            }
         });
         return await this.postSyncMessage(req);
     }
