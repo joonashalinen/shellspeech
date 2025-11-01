@@ -1,5 +1,11 @@
 import ServiceClient from "./ServiceClient.js";
 import readline from "readline"
+import * as fs from "fs/promises"
+import type { IServerProtocol } from "./ServiceWrapper.d.ts";
+import { WebSocket } from "ws";
+import { WebSocketMessenger } from "../../network/index.js";
+import type { DMessage } from "../../messaging/index.d.ts";
+import { SyncMessenger } from "../../messaging/index.js";
 
 export type IArgumentType = boolean | number | string;
 export type IArgumentTypeName = "boolean" | "number" | "string";
@@ -8,15 +14,38 @@ export interface IServiceConsoleBindings {
     [command: string]: IArgumentTypeName[];
 }
 
+export interface IServiceConsoleConfig {
+    serviceId: string;
+    clientId: string;
+    serviceAddress?: string;
+    protocol: IServerProtocol;
+}
+
 /**
  * A CLI client for a service that can be accessed via a ServiceClient.
  */
 export class ServiceConsole {
-    constructor(public client: ServiceClient, public bindings: IServiceConsoleBindings) {
+    public client: ServiceClient;
+
+    constructor(public bindings: IServiceConsoleBindings) {
         
     }
 
-    initialize() {
+    async initialize(configPath: string) {
+        const config = JSON.parse(await fs.readFile(configPath, 'utf-8')) as IServiceConsoleConfig;
+
+        if (config.protocol === "webSocket") {
+            const socket = new WebSocket(config.serviceAddress);
+            const messenger = new WebSocketMessenger<DMessage, DMessage>(socket);
+            await messenger.initialize();
+            const syncMessenger = new SyncMessenger(messenger);
+
+            this.client = new ServiceClient(syncMessenger, config.clientId, config.serviceId);
+            this.client.initialize();
+        } else {
+            throw new Error("Local services not currently supported");
+        }
+
         // Set up readline interface for listening to console input
         const rl = readline.createInterface({
             input: process.stdin,

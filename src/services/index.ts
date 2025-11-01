@@ -3,7 +3,7 @@ import type IService from "./pub/IService.d.ts";
 import OpenService from "./pub/OpenService.js";
 import ServiceClient from "./pub/ServiceClient.js";
 import { ServiceConsole } from "./pub/ServiceConsole.js";
-import type { IServiceConsoleBindings, IArgumentTypeName, IArgumentType } from "./pub/ServiceConsole.d.ts";
+import type { IServiceConsoleBindings, IArgumentTypeName, IArgumentType, IServiceConsoleConfig } from "./pub/ServiceConsole.d.ts";
 import { ServiceWrapper, IServiceWrapperConfig, IServerProtocol } from "./pub/ServiceWrapper.js";
 
 export {
@@ -17,5 +17,6 @@ export {
     ServiceConsole,
     IServiceConsoleBindings,
     IArgumentTypeName,
-    IArgumentType
+    IArgumentType,
+    IServiceConsoleConfig
 }

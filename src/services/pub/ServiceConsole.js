@@ -7,31 +7,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import ServiceClient from "./ServiceClient.js";
 import readline from "readline";
+import * as fs from "fs/promises";
+import { WebSocket } from "ws";
+import { WebSocketMessenger } from "../../network/index.js";
+import { SyncMessenger } from "../../messaging/index.js";
 /**
  * A CLI client for a service that can be accessed via a ServiceClient.
  */
 export class ServiceConsole {
-    constructor(client, bindings) {
-        this.client = client;
+    constructor(bindings) {
         this.bindings = bindings;
     }
-    initialize() {
-        // Set up readline interface for listening to console input
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            prompt: '> '
-        });
-        rl.prompt();
-        rl.on('line', (line) => __awaiter(this, void 0, void 0, function* () {
-            if (line.trim()) {
-                yield this.executeLine(line.trim());
+    initialize(configPath) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const config = JSON.parse(yield fs.readFile(configPath, 'utf-8'));
+            if (config.protocol === "webSocket") {
+                const socket = new WebSocket(config.serviceAddress);
+                const messenger = new WebSocketMessenger(socket);
+                yield messenger.initialize();
+                const syncMessenger = new SyncMessenger(messenger);
+                this.client = new ServiceClient(syncMessenger, config.clientId, config.serviceId);
+                this.client.initialize();
             }
+            else {
+                throw new Error("Local services not currently supported");
+            }
+            // Set up readline interface for listening to console input
+            const rl = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout,
+                prompt: '> '
+            });
             rl.prompt();
-        }));
-        rl.on('close', () => {
-            process.exit(0);
+            rl.on('line', (line) => __awaiter(this, void 0, void 0, function* () {
+                if (line.trim()) {
+                    yield this.executeLine(line.trim());
+                }
+                rl.prompt();
+            }));
+            rl.on('close', () => {
+                process.exit(0);
+            });
         });
     }
     executeLine(line) {
