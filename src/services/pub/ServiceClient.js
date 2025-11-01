@@ -29,6 +29,9 @@ export default class ServiceClient {
             });
         });
     }
+    call(method, args) {
+        return this._call(method, args);
+    }
     _call(method, args) {
         return this.messenger.postSyncMessage({
             sender: this.clientServiceId,

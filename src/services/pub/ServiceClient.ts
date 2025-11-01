@@ -19,6 +19,10 @@ export default class ServiceClient {
         });
     }
 
+    call<T>(method: string, args: unknown[]): Promise<T> {
+        return this._call(method, args);
+    }
+
     protected _call<T>(method: string, args: unknown[]): Promise<T> {
         return this.messenger.postSyncMessage({
             sender: this.clientServiceId,
