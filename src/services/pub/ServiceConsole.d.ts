@@ -23,4 +23,5 @@ export declare class ServiceConsole {
     private _checkArguments;
     private _parseArguments;
     private _printResult;
+    private _isShallowObject;
 }

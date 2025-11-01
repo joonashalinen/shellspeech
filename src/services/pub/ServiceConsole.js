@@ -127,12 +127,13 @@ export class ServiceConsole {
             console.log("(no result)");
             return;
         }
-        if (Array.isArray(result) && result.length > 0 && typeof result[0] === "object") {
+        if (Array.isArray(result) && result.length > 0 && typeof result[0] === "object" &&
+            this._isShallowObject(result[0])) {
             // Print as table
             const columns = Object.keys(result[0]);
             console.log(columns.join("\t"));
             result.forEach((row) => {
-                console.log(columns.map(col => row[col].toString()).join("\t"));
+                console.log(columns.map(col => (![undefined, null].includes(row[col]) ? row[col].toString() : "undefined")).join("\t"));
             });
         }
         else if (typeof result === "object") {
@@ -141,6 +142,9 @@ export class ServiceConsole {
         else {
             console.log(result);
         }
+    }
+    _isShallowObject(obj) {
+        return (Object.keys(obj).findIndex((k) => typeof obj[k] === "object" && obj[k] !== null)) === -1;
     }
 }
 //# sourceMappingURL=ServiceConsole.js.map
