@@ -8,6 +8,10 @@ import ProxyMessenger from "../../messaging/pub/ProxyMessenger.js";
  */
 export default interface IService {
     /**
+     * Logging function the service uses.
+     */
+    log: (msg: string) => unknown;
+    /**
      * A unique id of the service instance. This is used for contacting
      * the service by name from other services.
      */
@@ -30,7 +34,6 @@ export default interface IService {
      * event handler functions/methods.
      */
     eventHandlers?: {[event: string]: (...args: unknown[]) => unknown};
-    
     /**
      * Initialize the service. After calling this it is ready for use.
      */

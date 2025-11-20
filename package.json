@@ -1,6 +1,6 @@
 {
   "name": "shellspeech",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "A messaging library for microservices.",
   "main": "index.js",
   "scripts": {
@@ -51,6 +51,10 @@
     "./network": {
       "types": "./src/network/index.d.ts",
       "default": "./src/network/index.js"
+    },
+    "./monitoring": {
+      "types": "./src/monitoring/index.d.ts",
+      "default": "./src/monitoring/index.js"
     }
   }
 }

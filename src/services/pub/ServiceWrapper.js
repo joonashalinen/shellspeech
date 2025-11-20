@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import * as fs from "fs/promises";
 import { MessagePipe, MessengerClass } from "../../messaging/index.js";
 import { WebSocketServer } from "../../network/index.js";
+import FileLog from "../../monitoring/FileLog.js";
 /**
  * Base class providing common integration code around IServices.
  * For example, code for establishing a WebSocket server, through
@@ -25,6 +26,11 @@ export class ServiceWrapper {
         return __awaiter(this, void 0, void 0, function* () {
             this._config = JSON.parse(yield fs.readFile(configPath, 'utf-8'));
             this._service.id = this._config.id;
+            if (typeof this._config.fileLog === "object") {
+                const fileLogOptions = this._config.fileLog;
+                this._fileLog = new FileLog(fileLogOptions.directory, fileLogOptions.baseFileName, fileLogOptions.maxSize);
+                this._service.log = this._fileLog.log;
+            }
             if (this._isServer) {
                 if (this._serverProtocol === "webSocket") {
                     const server = new WebSocketServer({ port: this._config.serverPort });
