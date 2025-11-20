@@ -15,5 +15,5 @@ export default class Service implements IService {
     log: (msg: string) => unknown;
     protected _initialized: boolean;
     constructor(id: string);
-    initialize(): Promise<void>;
+    initialize(...args: unknown[]): Promise<void>;
 }

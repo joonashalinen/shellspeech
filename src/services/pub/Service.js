@@ -16,7 +16,7 @@ export default class Service {
         this.log = console.log;
         this._initialized = false;
     }
-    initialize() {
+    initialize(...args) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this._initialized)
                 return;

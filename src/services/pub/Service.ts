@@ -13,7 +13,7 @@ export default class Service implements IService {
 
     constructor(public id: string) {}
     
-    async initialize(): Promise<void> {
+    async initialize(...args: unknown[]): Promise<void> {
         if (this._initialized) return;
         this._initialized = true;
     }
