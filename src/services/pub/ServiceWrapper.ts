@@ -35,7 +35,7 @@ export class ServiceWrapper<IServiceConfig> {
             const fileLogOptions = this._config.fileLog;
             this._fileLog = new FileLog(
                 fileLogOptions.directory, fileLogOptions.baseFileName, fileLogOptions.maxSize);
-            this._service.log = this._fileLog.log;
+            this._service.log = this._fileLog.log.bind(this._fileLog);
         }
 
         if (this._isServer) {

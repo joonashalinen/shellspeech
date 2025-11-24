@@ -13,7 +13,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 export default class Service {
     constructor(id) {
         this.id = id;
-        this.log = console.log;
+        this.log = console.log.bind(console);
         this._initialized = false;
     }
     initialize(...args) {

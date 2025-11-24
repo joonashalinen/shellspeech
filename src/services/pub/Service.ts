@@ -8,7 +8,7 @@ export default class Service implements IService {
     public proxyMessenger?: ProxyMessenger<DMessage, DMessage>;
     public outEvents?: { [listenerMethod: string]: string; };
     public eventHandlers?: { [event: string]: (...args: unknown[]) => unknown; };
-    public log: (msg: string) => unknown = console.log;
+    public log: (msg: string) => unknown = console.log.bind(console);
     protected _initialized: boolean = false;
 
     constructor(public id: string) {}
