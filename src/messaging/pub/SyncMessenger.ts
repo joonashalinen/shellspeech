@@ -15,6 +15,7 @@ export default class SyncMessenger {
     messenger: IMessenger<DMessage, DMessage>;
     idGenerator = new StringSequence(new ArithmeticSequence());
     emitter: EventEmitter = new EventEmitter();
+    listeners: Map<Function, [string, Function]> = new Map();
 
     constructor(messenger: IMessenger<DMessage, DMessage>) {
         this.messenger = messenger;
@@ -51,16 +52,33 @@ export default class SyncMessenger {
     async listen(req: DMessage, callback: (...args: unknown[]) => unknown): Promise<unknown> {
         if (req.type !== "listen")
             throw new Error("SyncMessenger.listen expects the message to have type 'listen'");
+        if (this.listeners.has(callback)) return;
 
         if (req.id === undefined) {
             req.id = req.sender + ":" + this.idGenerator.next();
         }
 
-        this.emitter.on(req.id, (m: DMessage) => {
+        const listener = (m: DMessage) => {
             if (m.type === "event" && m.recipient === req.sender && m.id === req.id) {
                 callback(...m.message.args);
             }
-        });
+        };
+
+        this.listeners.set(callback, [req.id, listener]);
+        this.emitter.on(req.id, listener);
+        return await this.postSyncMessage(req);
+    }
+
+    async unlisten(req: DMessage, callback: (...args: unknown[]) => unknown): Promise<unknown> {
+        if (req.type !== "unlisten")
+            throw new Error("SyncMessenger.unlisten expects the message to have type 'unlisten'");
+        if (!this.listeners.has(callback)) return;
+
+        const [reqId, listener] = this.listeners.get(callback);
+        this.listeners.delete(callback);
+        this.emitter.off(reqId, listener);
+        req.id = reqId;
+
         return await this.postSyncMessage(req);
     }
 }

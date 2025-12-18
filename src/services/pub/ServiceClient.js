@@ -57,5 +57,19 @@ export default class ServiceClient {
             yield this.messenger.listen(req, callback);
         });
     }
+    _unlisten(method, args, callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const req = {
+                sender: this.clientServiceId,
+                recipient: this.targetServiceId,
+                type: "unlisten",
+                message: {
+                    type: method,
+                    args: args
+                }
+            };
+            yield this.messenger.unlisten(req, callback);
+        });
+    }
 }
 //# sourceMappingURL=ServiceClient.js.map

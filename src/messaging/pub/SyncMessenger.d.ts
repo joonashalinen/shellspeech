@@ -13,6 +13,7 @@ export default class SyncMessenger {
     messenger: IMessenger<DMessage, DMessage>;
     idGenerator: StringSequence;
     emitter: EventEmitter;
+    listeners: Map<Function, [string, Function]>;
     constructor(messenger: IMessenger<DMessage, DMessage>);
     /**
      * Posts a synchronous message that will yield
@@ -20,4 +21,5 @@ export default class SyncMessenger {
      */
     postSyncMessage(req: DMessage): Promise<unknown>;
     listen(req: DMessage, callback: (...args: unknown[]) => unknown): Promise<unknown>;
+    unlisten(req: DMessage, callback: (...args: unknown[]) => unknown): Promise<unknown>;
 }

@@ -11,8 +11,9 @@ type Messenger = IMessenger<DMessage, DMessage>;
  * The ProxyMessenger is assumed to be such that the wrappee class 
  * has access to it and can thus use it to send and receive messages to and from MessengerClass.
  */
-export default class MessengerClass<C> implements IMessenger<DMessage, DMessage> {
+export default class MessengerClass<C extends object> implements IMessenger<DMessage, DMessage> {
     emitter: EventEmitter = new EventEmitter();
+    listeners: Map<string, Function> = new Map();
     errorPolicy: "crash" | "notify" = "crash";
 
     constructor(
@@ -31,7 +32,9 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
      * The given msg is assumed to be of type "request".
      */
     async _callMethod(msg: DMessage) {
-        const args: unknown[] = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
+        let args: unknown[] = msg.message.args;
+        if (msg.type === "listen") args = this._listenCallArgs(msg);
+        if (msg.type === "unlisten") args = this._unlistenCallArgs(msg);
 
         let result: unknown;
         let error: unknown;
@@ -127,6 +130,17 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
             }]);
         };
 
+        this.listeners.set(`${msg.sender}-${msg.id}`, callback);
+        args[functionIndex !== -1 ? functionIndex : args.length] = callback;
+        return args;
+    }
+
+    private _unlistenCallArgs(msg: DMessage) {
+        const args = Array.from(msg.message.args);
+        const functionIndex = args.findIndex((a) => a === "<f>");
+
+        const callback = this.listeners.get(`${msg.sender}-${msg.id}`);
+        this.listeners.delete(`${msg.sender}-${msg.id}`);
         args[functionIndex !== -1 ? functionIndex : args.length] = callback;
         return args;
     }

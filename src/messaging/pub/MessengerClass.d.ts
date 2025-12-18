@@ -9,11 +9,12 @@ type Messenger = IMessenger<DMessage, DMessage>;
  * The ProxyMessenger is assumed to be such that the wrappee class
  * has access to it and can thus use it to send and receive messages to and from MessengerClass.
  */
-export default class MessengerClass<C> implements IMessenger<DMessage, DMessage> {
+export default class MessengerClass<C extends object> implements IMessenger<DMessage, DMessage> {
     wrappee: C;
     proxyMessenger?: ProxyMessenger<DMessage, DMessage>;
     id: string;
     emitter: EventEmitter;
+    listeners: Map<string, Function>;
     errorPolicy: "crash" | "notify";
     constructor(wrappee: C, proxyMessenger?: ProxyMessenger<DMessage, DMessage>, id?: string);
     /**
@@ -26,5 +27,6 @@ export default class MessengerClass<C> implements IMessenger<DMessage, DMessage>
     onMessage(handler: (msg: DMessage) => void): Messenger;
     offMessage(handler: (msg: DMessage) => void): Messenger;
     private _listenCallArgs;
+    private _unlistenCallArgs;
 }
 export {};

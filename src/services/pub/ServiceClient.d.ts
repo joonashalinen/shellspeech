@@ -11,4 +11,5 @@ export default class ServiceClient {
     call<T>(method: string, args: unknown[]): Promise<T>;
     protected _call<T>(method: string, args: unknown[]): Promise<T>;
     protected _listen(method: string, args: unknown[], callback: (...args: unknown[]) => unknown): Promise<void>;
+    protected _unlisten(method: string, args: unknown[], callback: (...args: unknown[]) => unknown): Promise<void>;
 }

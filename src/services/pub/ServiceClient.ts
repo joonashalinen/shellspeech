@@ -50,4 +50,20 @@ export default class ServiceClient {
 
         await this.messenger.listen(req, callback);
     }
+
+    protected async _unlisten(method: string,
+        args: unknown[], callback: (...args: unknown[]) => unknown): Promise<void> {
+        
+        const req: DMessage = {
+            sender: this.clientServiceId,
+            recipient: this.targetServiceId,
+            type: "unlisten",
+            message: {
+                type: method,
+                args: args
+            }
+        };
+
+        await this.messenger.unlisten(req, callback);
+    }
 }

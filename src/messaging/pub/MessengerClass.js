@@ -20,6 +20,7 @@ export default class MessengerClass {
         this.proxyMessenger = proxyMessenger;
         this.id = id;
         this.emitter = new EventEmitter();
+        this.listeners = new Map();
         this.errorPolicy = "crash";
         if (proxyMessenger !== undefined) {
             proxyMessenger.onPostMessage((msg) => this.emitter.trigger("message", [msg]));
@@ -32,7 +33,11 @@ export default class MessengerClass {
      */
     _callMethod(msg) {
         return __awaiter(this, void 0, void 0, function* () {
-            const args = msg.type === "listen" ? this._listenCallArgs(msg) : msg.message.args;
+            let args = msg.message.args;
+            if (msg.type === "listen")
+                args = this._listenCallArgs(msg);
+            if (msg.type === "unlisten")
+                args = this._unlistenCallArgs(msg);
             let result;
             let error;
             if (this.errorPolicy === "crash") {
@@ -110,6 +115,15 @@ export default class MessengerClass {
                     }
                 }]);
         };
+        this.listeners.set(`${msg.sender}-${msg.id}`, callback);
+        args[functionIndex !== -1 ? functionIndex : args.length] = callback;
+        return args;
+    }
+    _unlistenCallArgs(msg) {
+        const args = Array.from(msg.message.args);
+        const functionIndex = args.findIndex((a) => a === "<f>");
+        const callback = this.listeners.get(`${msg.sender}-${msg.id}`);
+        this.listeners.delete(`${msg.sender}-${msg.id}`);
         args[functionIndex !== -1 ? functionIndex : args.length] = callback;
         return args;
     }
