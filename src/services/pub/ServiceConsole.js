@@ -59,13 +59,13 @@ export class ServiceConsole {
                 console.error(`Unknown command: ${command}`);
                 return;
             }
-            if (!this._checkArguments(command, args)) {
+            if (!(yield this._checkArguments(command, args))) {
                 console.error(`Invalid arguments for command: ${command}`);
                 console.error(`Expected: ${this.bindings[command].join(", ")}`);
                 return;
             }
             try {
-                const parsedArgs = this._parseArguments(command, args);
+                const parsedArgs = yield this._parseArguments(command, args);
                 const result = yield this.client.call(command, parsedArgs);
                 this._printResult(result);
             }
@@ -75,51 +75,81 @@ export class ServiceConsole {
         });
     }
     _checkArguments(command, args) {
-        const expectedTypes = this.bindings[command];
-        if (!expectedTypes) {
-            return false;
-        }
-        if (args.length !== expectedTypes.length) {
-            return false;
-        }
-        // Check each argument matches its expected type
-        for (let i = 0; i < args.length; i++) {
-            const arg = args[i];
-            const expectedType = expectedTypes[i];
-            switch (expectedType) {
-                case "boolean":
-                    if (arg.toLowerCase() !== "true" && arg.toLowerCase() !== "false") {
-                        return false;
-                    }
-                    break;
-                case "number":
-                    if (isNaN(parseFloat(arg)) || !isFinite(parseFloat(arg))) {
-                        return false;
-                    }
-                    break;
-                case "string":
-                    // Strings are always valid
-                    break;
-                default:
-                    return false;
+        return __awaiter(this, void 0, void 0, function* () {
+            const expectedTypes = this.bindings[command];
+            if (!expectedTypes) {
+                return false;
             }
-        }
-        return true;
+            if (args.length !== expectedTypes.length) {
+                return false;
+            }
+            // Check each argument matches its expected type
+            for (let i = 0; i < args.length; i++) {
+                const arg = args[i];
+                const expectedType = expectedTypes[i];
+                switch (expectedType) {
+                    case "boolean":
+                        if (arg.toLowerCase() !== "true" && arg.toLowerCase() !== "false") {
+                            return false;
+                        }
+                        break;
+                    case "number":
+                        if (isNaN(parseFloat(arg)) || !isFinite(parseFloat(arg))) {
+                            return false;
+                        }
+                        break;
+                    case "string":
+                        // Strings are always valid
+                        break;
+                    case "json":
+                        try {
+                            const parts = arg.split(".json");
+                            // If the argument is the path of a json file
+                            if (parts.length === 2 && parts[parts.length - 1] === "") {
+                                JSON.parse(yield fs.readFile(arg, "utf-8"));
+                            }
+                            else {
+                                // The argument is a direct json object declaration
+                                JSON.parse(arg);
+                            }
+                        }
+                        catch (e) {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            return true;
+        });
     }
     _parseArguments(command, args) {
-        const expectedTypes = this.bindings[command];
-        return args.map((arg, index) => {
-            const type = expectedTypes[index];
-            switch (type) {
-                case "boolean":
-                    return arg.toLowerCase() === "true";
-                case "number":
-                    return parseFloat(arg);
-                case "string":
-                    return arg;
-                default:
-                    return arg;
-            }
+        return __awaiter(this, void 0, void 0, function* () {
+            const expectedTypes = this.bindings[command];
+            return Promise.all(args.map((arg, index) => __awaiter(this, void 0, void 0, function* () {
+                const type = expectedTypes[index];
+                switch (type) {
+                    case "boolean":
+                        return arg.toLowerCase() === "true";
+                    case "number":
+                        return parseFloat(arg);
+                    case "string":
+                        return arg;
+                    case "json":
+                        const parts = arg.split(".json");
+                        // If the argument is the path of a json file
+                        if (parts.length === 2 && parts[parts.length - 1] === "") {
+                            return JSON.parse(yield fs.readFile(arg, "utf-8"));
+                        }
+                        else {
+                            // The argument is a direct json object declaration
+                            return JSON.parse(arg);
+                        }
+                    default:
+                        return arg;
+                }
+            })));
         });
     }
     _printResult(result) {

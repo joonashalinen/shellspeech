@@ -1,7 +1,7 @@
 import ServiceClient from "./ServiceClient.js";
 import type { IServerProtocol } from "./ServiceWrapper.d.ts";
 export type IArgumentType = boolean | number | string;
-export type IArgumentTypeName = "boolean" | "number" | "string";
+export type IArgumentTypeName = "boolean" | "number" | "string" | "json";
 export interface IServiceConsoleBindings {
     [command: string]: IArgumentTypeName[];
 }
