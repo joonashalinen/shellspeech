@@ -8,7 +8,7 @@ import type { DMessage } from "../../messaging/index.d.ts";
 import { SyncMessenger } from "../../messaging/index.js";
 
 export type IArgumentType = boolean | number | string;
-export type IArgumentTypeName = "boolean" | "number" | "string";
+export type IArgumentTypeName = "boolean" | "number" | "string" | "json";
 
 export interface IServiceConsoleBindings {
     [command: string]: IArgumentTypeName[];
@@ -119,6 +119,14 @@ export class ServiceConsole {
                 case "string":
                     // Strings are always valid
                     break;
+                case "json":
+                    try {
+                        JSON.parse(arg);
+                        return true;
+                    } catch(e) {
+                        return false;
+                    }
+                    break;
                 default:
                     return false;
             }
@@ -138,6 +146,8 @@ export class ServiceConsole {
                     return parseFloat(arg);
                 case "string":
                     return arg;
+                case "json":
+                    return JSON.parse(arg);
                 default:
                     return arg;
             }
