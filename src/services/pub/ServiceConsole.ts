@@ -75,14 +75,14 @@ export class ServiceConsole {
             return;
         }
 
-        if (!this._checkArguments(command, args)) {
+        if (!(await this._checkArguments(command, args))) {
             console.error(`Invalid arguments for command: ${command}`);
             console.error(`Expected: ${this.bindings[command].join(", ")}`);
             return;
         }
 
         try {
-            const parsedArgs = this._parseArguments(command, args);
+            const parsedArgs = await this._parseArguments(command, args);
             const result = await this.client.call(command, parsedArgs);
             this._printResult(result);
         } catch (error) {
@@ -90,7 +90,7 @@ export class ServiceConsole {
         }
     }
 
-    private _checkArguments(command: string, args: string[]): boolean {
+    private async _checkArguments(command: string, args: string[]): Promise<boolean> {
         const expectedTypes = this.bindings[command];
         if (!expectedTypes) {
             return false;
@@ -121,8 +121,14 @@ export class ServiceConsole {
                     break;
                 case "json":
                     try {
-                        JSON.parse(arg);
-                        return true;
+                        const parts = arg.split(".json");
+                        // If the argument is the path of a json file
+                        if (parts.length === 2 && parts[parts.length - 1] === "") {
+                            JSON.parse(await fs.readFile(arg, "utf-8"));
+                        } else {
+                            // The argument is a direct json object declaration
+                            JSON.parse(arg);
+                        }
                     } catch(e) {
                         return false;
                     }
@@ -135,9 +141,9 @@ export class ServiceConsole {
         return true;
     }
 
-    private _parseArguments(command: string, args: string[]): IArgumentType[] {
+    private async _parseArguments(command: string, args: string[]): Promise<IArgumentType[]> {
         const expectedTypes = this.bindings[command];
-        return args.map((arg, index) => {
+        return Promise.all(args.map(async (arg, index) => {
             const type = expectedTypes[index];
             switch (type) {
                 case "boolean":
@@ -147,11 +153,18 @@ export class ServiceConsole {
                 case "string":
                     return arg;
                 case "json":
-                    return JSON.parse(arg);
+                    const parts = arg.split(".json");
+                    // If the argument is the path of a json file
+                    if (parts.length === 2 && parts[parts.length - 1] === "") {
+                        return JSON.parse(await fs.readFile(arg, "utf-8"));
+                    } else {
+                        // The argument is a direct json object declaration
+                        return JSON.parse(arg);
+                    }
                 default:
                     return arg;
             }
-        });
+        }));
     }
 
     private _printResult(result: unknown) {
