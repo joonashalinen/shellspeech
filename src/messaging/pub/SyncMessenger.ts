@@ -34,15 +34,17 @@ export default class SyncMessenger {
         }
         
         const waitForResponse = new Promise<unknown>((resolve, reject) => {
-            this.messenger.onMessage((res: DMessage) => {
+            const handler = (res: DMessage) => {
                 if (res.type === "response" && res.recipient === req.sender && res.id === req.id) {
                     if (res.error === undefined) {
+                        this.messenger.offMessage(handler);
                         resolve(res.message.args[0]);
                     } else {
                         reject(new Error(res.error));
                     }
                 }
-            });
+            };
+            this.messenger.onMessage(handler);
         });
 
         this.messenger.postMessage(req);
